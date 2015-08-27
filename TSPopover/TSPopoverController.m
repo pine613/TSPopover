@@ -97,11 +97,30 @@
 - (void) showPopoverWithTouch:(UIEvent*)senderEvent
 {    
     UIView *senderView = [[senderEvent.allTouches anyObject] view];
+    [self showPopoverWithView:senderView];
+}
+
+- (void) showPopoverWithMultiTouch:(UIEvent*)senderEvent
+{
+    NSSet *allTouches = senderEvent.allTouches;
+
+    for (UITouch *touch in allTouches) {
+        if ([[touch view] isKindOfClass:[UIView class]]) {
+            [self showPopoverWithView:[touch view]];
+            return;
+        }
+    }
+
+    [self showPopoverWithTouch:senderEvent];
+}
+
+- (void) showPopoverWithView:(UIView*)senderView
+{
     CGPoint applicationFramePoint = CGPointMake(screenRect.origin.x,0-screenRect.origin.y);
     //CGPoint senderLocationInWindowPoint = [[[UIApplication sharedApplication] keyWindow] convertPoint:applicationFramePoint fromView:senderView];
     UIWindow *appWindow = [[UIApplication sharedApplication] keyWindow];
     CGPoint senderLocationInWindowPoint = [appWindow.rootViewController.view convertPoint:applicationFramePoint fromView:senderView];
-    CGRect senderFrame = [[[senderEvent.allTouches anyObject] view] frame];
+    CGRect senderFrame = [senderView frame];
     senderFrame.origin.x = senderLocationInWindowPoint.x;
     senderFrame.origin.y = senderLocationInWindowPoint.y;
     CGPoint senderPoint = [self senderPointFromSenderRect:senderFrame];
